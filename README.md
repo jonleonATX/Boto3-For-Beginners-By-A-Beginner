@@ -1,5 +1,5 @@
 # Boto3ForBeginnersByABeginner
-I amsSharing what I've learned at the most basic level to others who need or want the stepping stones to better automation. I recently received my AWS Solutions Architect Associate certification and have been learning the AWS Command Line, bash scripting and python.
+I am sharing what I've learned at the most basic level to others who need or want the stepping stones to better automation. I recently received my AWS Solutions Architect Associate certification and have been learning the AWS Command Line, bash scripting and python.
 Here you'll find python scripts for various AWS services that are very basic but allow newbies to see how the code works and what is avaialble.
 I didn't always find what examples of what I was looking for and many answers were beyond my skill set. So I write the code and comment it so I know what/why things happen when little changes in code can mean a lot.
 
