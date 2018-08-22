@@ -1,0 +1,158 @@
+boto3 s3 bucket examples
+
+
+# boto3 is AWS Python SDK
+# pprint formats the json output for easier reading
+# json parser - very helpful
+import boto3
+from pprint import pprint
+import json
+
+# create the session and get s3 resource as well as s3 client
+# this assumes you have configured aws for a user (aws configure --profile ImAUser)
+
+myProfile = 'ImAUser'
+bucket = 'pdfs-guides'
+
+session = boto3.Session(profile_name=myProfile)
+s3 = session.resource('s3')
+s3c = boto3.client('s3')
+
+print(session)
+			Session(region_name=None)
+print(s3)
+			s3.ServiceResource()
+print(s3c)
+			<botocore.client.S3 object at 0x000001F81AB1BA20>
+
+print(bucket_name.name)
+			pdfs-guides
+print(bucket_name.creation_date)
+			2018-07-13 02:19:44+00:00
+
+print(response)
+			{'ResponseMetadata': {'RequestId': 'AF8E1BC387F36A1F', 'HostId': 'NsA6EgbgVi/Treu6IHniYKQEXZOW42aIKTEtL5vdOpEEmd5Sj3BJ2E+SpgJuayLDQxonNbDXdag=', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amz-id-2': 'NsA6EgbgVi/Treu6IHniYKQEXZOW42aIKTEtL5vdOpEEmd5Sj3BJ2E+SpgJuayLDQxonNbDXdag=', 'x-amz-request-id': 'AF8E1BC387F36A1F', 'date': 'Tue, 21 Aug 2018 15:22:51 GMT', 'content-type': 'application/xml', 'transfer-encoding': 'chunked', 'server': 'AmazonS3'}, 'RetryAttempts': 0}, 'Buckets': [{'Name': 'files-detextro', 'CreationDate': datetime.datetime(2018, 6, 29, 19, 35, 37, tzinfo=tzutc())}, {'Name': 'files-pse', 'CreationDate': datetime.datetime(2018, 6, 29, 19, 35, 10, tzinfo=tzutc())}, {'Name': 'mylambda-trigger-bucket', 'CreationDate': datetime.datetime(2018, 6, 27, 3, 40, 22, tzinfo=tzutc())}, {'Name': 'pdfs-guides', 'CreationDate': datetime.datetime(2018, 7, 13, 2, 19, 44, tzinfo=tzutc())}], 'Owner': {'DisplayName': 'xxxxxxxxxx', 'ID': '52146ac013914296c69cb12f461a9a7c97665bc94383ea6230ffa047d4225723'}}
+
+pprint(response)
+			{'Buckets': [{'CreationDate': datetime.datetime(2018, 6, 29, 19, 35, 37, tzinfo=tzutc()),
+			'Name': 'files-detextro'},
+			{'CreationDate': datetime.datetime(2018, 6, 29, 19, 35, 10, tzinfo=tzutc()),
+			'Name': 'files-pse'},
+			{'CreationDate': datetime.datetime(2018, 6, 27, 3, 40, 22, tzinfo=tzutc()),
+			'Name': 'mylambda-trigger-bucket'},
+			{'CreationDate': datetime.datetime(2018, 7, 13, 2, 19, 44, tzinfo=tzutc()),
+			'Name': 'pdfs-guides'}],
+			'Owner': {'DisplayName': 'xxxxxxxxx',
+			'ID': '52146ac013914296c69cb12f461a9a7c97665bc94383ea6230ffa047d4225723'},
+			'ResponseMetadata': {'HTTPHeaders': {'content-type': 'application/xml',
+			'date': 'Tue, 21 Aug 2018 15:22:51 GMT',
+			'server': 'AmazonS3',
+			'transfer-encoding': 'chunked',
+			'x-amz-id-2': 'NsA6EgbgVi/Treu6IHniYKQEXZOW42aIKTEtL5vdOpEEmd5Sj3BJ2E+SpgJuayLDQxonNbDXdag=',
+			'x-amz-request-id': 'AF8E1BC387F36A1F'},
+			'HTTPStatusCode': 200,
+			'HostId': 'NsA6EgbgVi/Treu6IHniYKQEXZOW42aIKTEtL5vdOpEEmd5Sj3BJ2E+SpgJuayLDQxonNbDXdag=',
+			'RequestId': 'AF8E1BC387F36A1F',
+			'RetryAttempts': 0}}
+
+
+for b in response['Buckets']:
+    print(b['Name'])
+
+			files-detextro
+			files-pse
+			mylambda-trigger-bucket
+			pdfs-guides
+
+print(buckets)
+			['files-detextro', 'files-pse', 'mylambda-trigger-bucket', 'pdfs-guides']
+
+print("Bucket List: %s" % buckets)
+				Bucket List: ['files-detextro', 'files-pse', 'mylambda-trigger-bucket', 'pdfs-guides']
+
+print("Bucket List:", buckets)
+				Bucket List: ['files-detextro', 'files-pse', 'mylambda-trigger-bucket', 'pdfs-guides']
+
+for b in buckets:
+    print(b)
+
+			files-detextro
+			files-pse
+			mylambda-trigger-bucket
+			pdfs-guides
+
+print(buckets[0])
+			files-detextro
+
+print(buckets[1])
+			files-pse
+
+print(len(buckets))
+			4
+
+print(policy)
+			{
+			"Version":"2012-10-17",
+			"Statement":[{
+			"Sid":"PublicReadGetObject",
+			"Effect":"Allow",
+			"Principal": "*",
+			"Action":["s3:GetObject"],
+			"Resource":["arn:aws:s3:::pdfs-guides/*"
+			]
+			}
+			]
+			}
+
+
+print(policy)
+			{
+			"Version":"2012-10-17",
+			"Statement":[{
+			"Sid":"PublicReadGetObject",
+			"Effect":"Allow",
+			"Principal": "*",
+			"Action":["s3:GetObject"],
+			"Resource":["arn:aws:s3:::pdfs-guides/*"
+			]
+			}
+			]
+			}
+
+print(current_policy)
+			{'ResponseMetadata': {'RequestId': 'E4661953A50BF123', 'HostId': 'pl+cH7ky1DGR4zwGIFrHAjWYHV+lVNkOa/PxrfhEx3Zaal7qDnGpRjrH7YR8U4CuZfNdN+6T3B8=', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amz-id-2': 'pl+cH7ky1DGR4zwGIFrHAjWYHV+lVNkOa/PxrfhEx3Zaal7qDnGpRjrH7YR8U4CuZfNdN+6T3B8=', 'x-amz-request-id': 'E4661953A50BF123', 'date': 'Tue, 21 Aug 2018 15:22:53 GMT', 'content-type': 'application/json', 'content-length': '165', 'server': 'AmazonS3'}, 'RetryAttempts': 0}, 'Policy': '{"Version":"2012-10-17","Statement":[{"Sid":"PublicReadGetObject","Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::pdfs-guides/*"}]}'}
+
+print(pol)
+			s3.BucketPolicy(bucket_name='pdfs-guides')
+
+print(current_policy)
+			{'ResponseMetadata': {'RequestId': '0B6B55EBD84BE915', 'HostId': 'qFfzjpgB2IjKwfnpQ9qArixWVCiUV6P4KlWBBNd+U2jvDijqOJ1CgTzQtp7wNmYzdrS62KlXsiE=', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amz-id-2': 'qFfzjpgB2IjKwfnpQ9qArixWVCiUV6P4KlWBBNd+U2jvDijqOJ1CgTzQtp7wNmYzdrS62KlXsiE=', 'x-amz-request-id': '0B6B55EBD84BE915', 'date': 'Tue, 21 Aug 2018 15:22:54 GMT', 'content-type': 'application/json', 'content-length': '165', 'server': 'AmazonS3'}, 'RetryAttempts': 0}, 'Policy': '{"Version":"2012-10-17","Statement":[{"Sid":"PublicReadGetObject","Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::pdfs-guides/*"}]}'}
+
+print(current_policy['ResponseMetadata'])
+			{'RequestId': '0B6B55EBD84BE915', 'HostId': 'qFfzjpgB2IjKwfnpQ9qArixWVCiUV6P4KlWBBNd+U2jvDijqOJ1CgTzQtp7wNmYzdrS62KlXsiE=', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amz-id-2': 'qFfzjpgB2IjKwfnpQ9qArixWVCiUV6P4KlWBBNd+U2jvDijqOJ1CgTzQtp7wNmYzdrS62KlXsiE=', 'x-amz-request-id': '0B6B55EBD84BE915', 'date': 'Tue, 21 Aug 2018 15:22:54 GMT', 'content-type': 'application/json', 'content-length': '165', 'server': 'AmazonS3'}, 'RetryAttempts': 0}
+
+print(current_policy['ResponseMetadata']['RequestId'])
+			0B6B55EBD84BE915
+
+print(current_policy['Policy'])
+			{"Version":"2012-10-17","Statement":[{"Sid":"PublicReadGetObject","Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::pdfs-guides/*"}]}
+
+print(pol_json['Statement'][0]['Effect'])
+			Allow
+
+for key in pol_json:
+  value = pol_json[key]
+  print("The key = {} ; value = {}".format(key, value))
+
+			The key = Version ; value = 2012-10-17
+			The key = Statement ; value = [{'Sid': 'PublicReadGetObject', 'Effect': 'Allow', 'Principal': '*', 'Action': 's3:GetObject', 'Resource': 'arn:aws:s3:::pdfs-guides/*'}]
+
+for key in pol_json['Statement'][0]:
+    value = pol_json['Statement'][0][key]
+    print("The key = {} ; value = {}".format(key, value))
+
+			The key = Sid ; value = PublicReadGetObject
+			The key = Effect ; value = Allow
+			The key = Principal ; value = *
+			The key = Action ; value = s3:GetObject
+			The key = Resource ; value = arn:aws:s3:::pdfs-guides/*
