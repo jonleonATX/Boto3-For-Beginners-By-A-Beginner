@@ -1,0 +1,57 @@
+Setting up PC/Windows to run several programs to automate AWS using boto3.
+
+This is based on classes I've taken and internet searches - this is my configuration and should be used 
+only as a starting point for your own projects.
+
+
+Open Windows Powershell as Administrator 
+
+Use chocolatey to install programs. Install chocolatey first from chocolatey.org
+
+Look for Install with PowerShell.exe
+
+PS C:\WINDOWS\system32> Get-ExecutionPolicy
+	-restricted error
+	
+PS C:\WINDOWS\system32> Set-ExecutionPolicy AllSigned
+	-all good
+
+PS C:\WINDOWS\system32> Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+Install a text editor that works well with Python. Using atom for this exercise
+PS C:\WINDOWS\system32> choco install atom -y
+
+Install Python3
+PS C:\WINDOWS\system32> choco install python3 -y
+
+Install nodejs (for serverless) - some AWS services are only written in node.js
+PS C:\WINDOWS\system32> choco install node -y
+	-if error, use choco install nodejs -y
+
+Install AWS Command Line
+PS C:\WINDOWS\system32> choco install awscli -y
+
+Using Github, so install Git
+PS C:\WINDOWS\system32> choco install git -y \GitAndUnixToolsOnPath
+
+Install SSH
+PS C:\WINDOWS\system32> choco install openssh -y
+
+
+REBOOT PC
+
+Run Powershell as regular user to install a couple more applications
+python loaded pip3 
+
+AWS Python uses boto3 SDK
+PS C:\WINDOWS\system32> python -m pip install --user boto3
+
+Install pipenv
+PS C:\Users\Home-PC> pip3 install pipenv
+
+Install npm (npm is like pip but for node)
+PS C:\Users\Home-PC> npm install -g serverless
+
+
+
+

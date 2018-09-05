@@ -1,0 +1,759 @@
+# coding: utf-8
+# assumes your PC is configured, or you've loaded everything for AWS, Python, boto3
+# and that you've created a user in AWS console and have access and secret access keys
+
+### NOTE: there are two variables that are hardcoded - myProfile and bucket
+### change them before running the script
+
+# boto3 is AWS Python SDK
+# pprint formats the json output for easier reading
+# json parser - very helpful
+
+: import boto3
+: from pprint import pprint
+: import json
+
+# create the session and get s3 resource as well as s3 client
+# this assumes you have configured aws for a user (aws configure --profile ImAUser)
+
+# myProfile = 'ImAUser'
+# bucket = 'my-bucket'
+
+: session = boto3.Session(profile_name=myProfile)
+: s3 = session.resource('s3')
+: s3c = boto3.client('s3')
+
+# see stored value in each variable above; verify no errors on start
+: print(session)
+: print(s3sr)
+: print(s3sc)
+: print(s3br)
+: print(s3bc)
+
+	Session(region_name='us-east-1')
+	s3.ServiceResource()
+	<botocore.client.S3 object at 0x000001EC6969CC50>
+	s3.ServiceResource()
+	<botocore.client.S3 object at 0x000001EC6B006F60>
+
+# bucket identifier and attribute
+# needs to be an existing bucket for user profile used
+: bucket_name = s3.Bucket(bucket)
+: print(bucket_name.name)
+: print(bucket_name.creation_date)
+
+	my-bucket
+	2018-03-24 22:26:36+00:00
+
+: bucket_objs = bucket_name.objects.all()
+:	print(bucket_objs)
+
+	s3.Bucket.objectsCollection(s3.Bucket(name='my-bucket'), s3.ObjectSummary)
+
+: for obj in bucket_objs:
+:     print(obj)
+
+	s3.ObjectSummary(bucket_name='my-bucket', key='fileFullResume.pdf')
+	s3.ObjectSummary(bucket_name='my-bucket', key='fileOnePageResume.pdf')
+	s3.ObjectSummary(bucket_name='my-bucket', key='images/')
+	s3.ObjectSummary(bucket_name='my-bucket', key='images/1.jpg')
+	s3.ObjectSummary(bucket_name='my-bucket', key='images/bg-tile.png')
+	s3.ObjectSummary(bucket_name='my-bucket', key='images/bullet.png')
+	s3.ObjectSummary(bucket_name='my-bucket', key='images/myheadshot.jpg')
+	s3.ObjectSummary(bucket_name='my-bucket', key='index.html')
+	s3.ObjectSummary(bucket_name='my-bucket', key='responsive.css')
+	s3.ObjectSummary(bucket_name='my-bucket', key='styles.css')
+	s3.ObjectSummary(bucket_name='my-bucket', key='synchtoS3.bat')
+
+: for obj in bucket_objs:
+:     print("Bucket = {} ; key = {}".format(obj.bucket_name, obj.key))
+
+	Bucket = my-bucket ; key = fileFullResume.pdf
+	Bucket = my-bucket ; key = fileOnePageResume.pdf
+	Bucket = my-bucket ; key = images/
+	Bucket = my-bucket ; key = images/1.jpg
+	Bucket = my-bucket ; key = images/bg-tile.png
+	Bucket = my-bucket ; key = images/bullet.png
+	Bucket = my-bucket ; key = images/myheadshot.jpg
+	Bucket = my-bucket ; key = index.html
+	Bucket = my-bucket ; key = responsive.css
+	Bucket = my-bucket ; key = styles.css
+	Bucket = my-bucket ; key = synchtoS3.bat
+
+: paginator = s3.meta.client.get_paginator('list_objects_v2')
+
+	<botocore.client.S3.Paginator.ListObjectsV2 at 0x24d1ff56f28>
+
+: for page in paginator.paginate(Bucket=bucket_name.name):
+:    pprint(page)
+
+	{'Contents': [{'ETag': '"acfec4e6a625db044e45692cd89d8c4d"',
+				   'Key': 'fileFullResume.pdf',
+				   'LastModified': datetime.datetime(2018, 6, 18, 2, 18, 32, tzinfo=tzutc()),
+				   'Size': 214128,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"2d8b1004e56933494925d626cf3b4ccc"',
+				   'Key': 'fileOnePageResume.pdf',
+				   'LastModified': datetime.datetime(2018, 6, 18, 2, 6, 42, tzinfo=tzutc()),
+				   'Size': 649348,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"d41d8cd98f00b204e9800998ecf8427e"',
+				   'Key': 'images/',
+				   'LastModified': datetime.datetime(2018, 3, 25, 1, 51, 58, tzinfo=tzutc()),
+				   'Size': 0,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"9c200bd6328ebfc4d0bf67fcd0986fee"',
+				   'Key': 'images/1.jpg',
+				   'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 53, tzinfo=tzutc()),
+				   'Size': 3575,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"2215d5774532605fbc09de34756c1d04"',
+				   'Key': 'images/bg-tile.png',
+				   'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 53, tzinfo=tzutc()),
+				   'Size': 35585,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"3aa4748da661a821068506665095ec3b"',
+				   'Key': 'images/bullet.png',
+				   'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 54, tzinfo=tzutc()),
+				   'Size': 568,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"9ff3f108e3042118ca8385d293d0f7c8"',
+				   'Key': 'images/myheadshot.jpg',
+				   'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 54, tzinfo=tzutc()),
+				   'Size': 648780,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"0bb988f8fed2d53e68d6f0f8b4f4dc7e"',
+				   'Key': 'index.html',
+				   'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 54, tzinfo=tzutc()),
+				   'Size': 10301,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"720b020bcf33309dc7d2f1b8fe90960b"',
+				   'Key': 'responsive.css',
+				   'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 54, tzinfo=tzutc()),
+				   'Size': 832,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"12aacb3fb812ce9845cac09fcc033e73"',
+				   'Key': 'styles.css',
+				   'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 55, tzinfo=tzutc()),
+				   'Size': 2998,
+				   'StorageClass': 'STANDARD'},
+				  {'ETag': '"0db24cf1d16b1abc5f0b9c5165fe1c8f"',
+				   'Key': 'synchtoS3.bat',
+				   'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 55, tzinfo=tzutc()),
+				   'Size': 64,
+				   'StorageClass': 'STANDARD'}],
+	 'IsTruncated': False,
+	 'KeyCount': 11,
+	 'MaxKeys': 1000,
+	 'Name': 'my-bucket',
+	 'Prefix': '',
+	 'ResponseMetadata': {'HTTPHeaders': {'content-type': 'application/xml',
+										  'date': 'Wed, 22 Aug 2018 18:00:08 GMT',
+										  'server': 'AmazonS3',
+										  'transfer-encoding': 'chunked',
+										  'x-amz-bucket-region': 'us-east-1',
+										  'x-amz-id-2': 'WtkS+XeWyTETMCLpVj51s1LeGRMSBI8idVE0YNIlox7IWMzUJwZ4kayg8pZhZ2n/RoeKfc5Ev+A=',
+										  'x-amz-request-id': 'CE2CBE25023B6A0D'},
+						  'HTTPStatusCode': 200,
+						  'HostId': 'WtkS+XeWyTETMCLpVj51s1LeGRMSBI8idVE0YNIlox7IWMzUJwZ4kayg8pZhZ2n/RoeKfc5Ev+A=',
+						  'RequestId': 'CE2CBE25023B6A0D',
+						  'RetryAttempts': 0}}
+
+
+
+: for page in paginator.paginate(Bucket=bucket_name.name):
+:     # pprint(page)
+:     for obj in page.get('Contents'):
+:         pprint(obj)
+:
+	{'ETag': '"acfec4e6a625db044e45692cd89d8c4d"',
+	 'Key': 'fileFullResume.pdf',
+	 'LastModified': datetime.datetime(2018, 6, 18, 2, 18, 32, tzinfo=tzutc()),
+	 'Size': 214128,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"2d8b1004e56933494925d626cf3b4ccc"',
+	 'Key': 'fileOnePageResume.pdf',
+	 'LastModified': datetime.datetime(2018, 6, 18, 2, 6, 42, tzinfo=tzutc()),
+	 'Size': 649348,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"d41d8cd98f00b204e9800998ecf8427e"',
+	 'Key': 'images/',
+	 'LastModified': datetime.datetime(2018, 3, 25, 1, 51, 58, tzinfo=tzutc()),
+	 'Size': 0,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"9c200bd6328ebfc4d0bf67fcd0986fee"',
+	 'Key': 'images/1.jpg',
+	 'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 53, tzinfo=tzutc()),
+	 'Size': 3575,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"2215d5774532605fbc09de34756c1d04"',
+	 'Key': 'images/bg-tile.png',
+	 'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 53, tzinfo=tzutc()),
+	 'Size': 35585,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"3aa4748da661a821068506665095ec3b"',
+	 'Key': 'images/bullet.png',
+	 'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 54, tzinfo=tzutc()),
+	 'Size': 568,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"9ff3f108e3042118ca8385d293d0f7c8"',
+	 'Key': 'images/myheadshot.jpg',
+	 'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 54, tzinfo=tzutc()),
+	 'Size': 648780,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"0bb988f8fed2d53e68d6f0f8b4f4dc7e"',
+	 'Key': 'index.html',
+	 'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 54, tzinfo=tzutc()),
+	 'Size': 10301,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"720b020bcf33309dc7d2f1b8fe90960b"',
+	 'Key': 'responsive.css',
+	 'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 54, tzinfo=tzutc()),
+	 'Size': 832,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"12aacb3fb812ce9845cac09fcc033e73"',
+	 'Key': 'styles.css',
+	 'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 55, tzinfo=tzutc()),
+	 'Size': 2998,
+	 'StorageClass': 'STANDARD'}
+	{'ETag': '"0db24cf1d16b1abc5f0b9c5165fe1c8f"',
+	 'Key': 'synchtoS3.bat',
+	 'LastModified': datetime.datetime(2018, 8, 19, 14, 13, 55, tzinfo=tzutc()),
+	 'Size': 64,
+	 'StorageClass': 'STANDARD'}
+
+
+response for this returns a dictionary so use [''] to get key value pairs
+: for page in paginator.paginate(Bucket=bucket_name.name):
+:     # pprint(page)
+:     for obj in page.get('Contents'):
+:         pprint(obj['Key'])
+
+	'fileFullResume.pdf'
+	'fileOnePageResume.pdf'
+	'images/'
+	'images/1.jpg'
+	'images/bg-tile.png'
+	'images/bullet.png'
+	'images/myheadshot.jpg'
+	'index.html'
+	'responsive.css'
+	'styles.css'
+	'synchtoS3.bat'
+
+
+: for page in paginator.paginate(Bucket=bucket_name.name):
+:     for obj in page.get('Contents'):
+:         # pprint(obj['Key'])
+:         print("Key = {} ; Etag = {}".format(obj['Key'], obj['ETag']))
+
+	Key = fileFullResume.pdf ; Etag = "acfec4e6a625db044e45692cd89d8c4d"
+	Key = fileOnePageResume.pdf ; Etag = "2d8b1004e56933494925d626cf3b4ccc"
+	Key = images/ ; Etag = "d41d8cd98f00b204e9800998ecf8427e"
+	Key = images/1.jpg ; Etag = "9c200bd6328ebfc4d0bf67fcd0986fee"
+	Key = images/bg-tile.png ; Etag = "2215d5774532605fbc09de34756c1d04"
+	Key = images/bullet.png ; Etag = "3aa4748da661a821068506665095ec3b"
+	Key = images/myheadshot.jpg ; Etag = "9ff3f108e3042118ca8385d293d0f7c8"
+	Key = index.html ; Etag = "0bb988f8fed2d53e68d6f0f8b4f4dc7e"
+	Key = responsive.css ; Etag = "720b020bcf33309dc7d2f1b8fe90960b"
+	Key = styles.css ; Etag = "12aacb3fb812ce9845cac09fcc033e73"
+	Key = synchtoS3.bat ; Etag = "0db24cf1d16b1abc5f0b9c5165fe1c8f"
+
+# get number of objects in this page
+: for page in paginator.paginate(Bucket=bucket_name.name):
+:     print("Number of keys on this page: {}".format(page.get('KeyCount')))
+:     print("Max number of keys possible: {}".format(page.get('MaxKeys')))
+
+	Number of keys on this page: 11
+	Max number of keys possible: 1000
+
+# get info by index number (specific file)
+: for page in paginator.paginate(Bucket=bucket_name.name):
+:     pprint(page.get('Contents')[0])
+
+	{'ETag': '"acfec4e6a625db044e45692cd89d8c4d"',
+	 'Key': 'fileFullResume.pdf',
+	 'LastModified': datetime.datetime(2018, 6, 18, 2, 18, 32, tzinfo=tzutc()),
+	 'Size': 214128,
+	 'StorageClass': 'STANDARD'}
+
+# nested get command
+: for page in paginator.paginate(Bucket=bucket_name.name):
+:     pprint(page.get('ResponseMetadata').get('HTTPHeaders'))
+
+	{'content-type': 'application/xml',
+	 'date': 'Wed, 22 Aug 2018 20:12:07 GMT',
+	 'server': 'AmazonS3',
+	 'transfer-encoding': 'chunked',
+	 'x-amz-bucket-region': 'us-east-1',
+	 'x-amz-id-2': 'OAz/y+mSkzF8tgQ7w4iDmRYSGJsJfAhm0ithUl1UOXOBkdoKGeXcVGwM06MbN4vVLwSVEaxM78Q=',
+	 'x-amz-request-id': 'AA8F3B31A94D9F39'}
+
+
+# this returns a dictionary, not a string of key:value pairs in HTTPHeaders
+: for page in paginator.paginate(Bucket=bucket_name.name):
+:     for k, v in page.get('ResponseMetadata').get('HTTPHeaders').items():
+:         print(k,v)
+
+	x-amz-id-2 JrlQURrtAqiUDr5YTnACm8k/n0ZGn8UPS7NKOsUil7+P4tinX49TdGVCZ48hJRkg2q1VGlBSi2g=
+	x-amz-request-id 086FC5EF94F14607
+	date Thu, 23 Aug 2018 16:28:25 GMT
+	x-amz-bucket-region us-east-1
+	content-type application/xml
+	transfer-encoding chunked
+	server AmazonS3
+
+# get value HTTPHeaders Key
+: for page in paginator.paginate(Bucket=bucket_name.name):
+:    pprint(page.get('ResponseMetadata').get('HTTPHeaders').get('content-type'))
+:    pprint(page.get('ResponseMetadata').get('HTTPHeaders').get('date'))
+:    pprint(page.get('ResponseMetadata').get('HTTPHeaders').get('x-amz-bucket-region'))
+
+	'application/xml'
+	'Wed, 22 Aug 2018 20:47:22 GMT'
+	'us-east-1'
+
+#uploading and downloading objects
+: pathname = 'C:/your/path/here/code/'
+: fn = 'sample.txt'
+: fullpath = Path(pathname + fn)
+: print(fullpath)
+
+	C:\your\path\here\code\sample.txt
+
+# upload a file with minimal logic using resource not client
+# upload with same filename
+: resp = bucket_name.upload_file(str(fullpath),
+    str(fn), ExtraArgs={'ContentType': 'text/plain'})
+: print(resp)
+
+	None
+
+#same as above but using mimetypes
+: content_type = mimetypes.guess_type(fn)[0] or 'text/plain'
+: print(content_type)
+
+	text/plain
+
+: bucket_name.upload_file(str(fullpath),
+:     str(fn), ExtraArgs={'ContentType': content_type})
+
+# download a file with minimal logic using resource not client
+# download with differnt filename
+: bucket_name.download_file(fn, pathname + 'hello.txt')
+
+# get object's ACL
+: object_acl = s3sr.ObjectAcl(bucket, fn)
+: print(object_acl.bucket_name)
+: print(object_acl.object_key)
+: print(object_acl.grants)
+: print(object_acl.owner)
+: print(object_acl.request_charged)
+: print(object_acl.get_available_subresources())
+: print(object_acl.Object())
+
+	my-bucket
+	sample.txt
+	[{'Grantee': {'DisplayName': 'imAowner', 'ID': '774ab3d545ed16464b9aee49278807d8f684d6badf068cb35c440e89685981', 'Type': 'CanonicalUser'}, 'Permission': 'FULL_CONTROL'}]
+	{'DisplayName': 'imAowner', 'ID': '774ab3d545ed16464b9aee49278807d8f684d6badf068cb35c440e89685981'}
+	None
+	['Object']
+	s3.Object(bucket_name='my-bucket', key='sample.txt')
+
+# get object's summary
+object_summary = s3sr.ObjectSummary(bucket, fn)
+: print(object_summary.bucket_name)
+: print(object_summary.key)
+: print(object_summary.e_tag)
+: print(object_summary.owner)
+: print(object_summary.get_available_subresources())
+: print(object_summary.Acl())
+: print(object_summary.Object())
+#print(object_summary.Version())  ## ValueError: Required parameter id not set
+: print(object_summary.last_modified)
+: timeFormat=object_summary.last_modified
+: formatedTime=timeFormat.strftime("%Y-%m-%d %H:%M:%S")
+: pprint( 'Bucket name is '+ bucket + ' and key name is ' + object_summary.key + ' \
+:    and last modified at time '+ formatedTime)
+
+	my-bucket
+	sample.txt
+	"6930ad3a6d2f96ce2991bbd51b2aaf6e"
+	None
+	['Acl', 'Bucket', 'MultipartUpload', 'Object', 'Version']
+	s3.ObjectAcl(bucket_name='my-bucket', object_key='sample.txt')
+	s3.Object(bucket_name='my-bucket', key='sample.txt')
+	2018-09-05 02:04:18+00:00
+	('Bucket name is my-bucket and key name is sample.txt and last modified '
+	 'at time 2018-09-05 02:04:18')
+
+
+# get object
+: object = s3sr.Object(bucket, fn)
+: print(object.bucket_name)
+: print(object.key)
+: print(object.e_tag)
+: print(object.delete_marker)
+: print(object.website_redirect_location)
+: print(object.version_id)
+: ver_id = object.version_id
+: print(object.Version(ver_id))
+
+	my-bucket
+	sample.txt
+	"6930ad3a6d2f96ce2991bbd51b2aaf6e"
+	None
+	None
+	GQqYjlcbQNcH1Uus7_nfqzWaMJzl74ui
+	s3.ObjectVersion(bucket_name='my-bucket', object_key='sample.txt', id='GQqYjlcbQNcH1Uus7_nfqzWaMJzl74ui')
+
+# get object's versions
+: version_all_data = s3bc.list_object_versions (Bucket = bucket, Prefix = fn)
+: pprint(version_all_data)
+
+	{'IsTruncated': False,
+	 'KeyMarker': '',
+	 'MaxKeys': 1000,
+	 'Name': 'my-bucket',
+	 'Prefix': 'sample.txt',
+	 'ResponseMetadata': {'HTTPHeaders': {'content-type': 'application/xml',
+	                                      'date': 'Wed, 05 Sep 2018 02:04:19 GMT',
+	                                      'server': 'AmazonS3',
+	                                      'transfer-encoding': 'chunked',
+	                                      'x-amz-id-2': 'GLwVPGYnU8F0p0jTNKUmf2rgIu4KrOah0vi6+LZd0DMPKlsVF00fpizhhw76V1+yIu8pvVGmufU=',
+	                                      'x-amz-request-id': 'B26E9C978D7A2260'},
+	                      'HTTPStatusCode': 200,
+	                      'HostId': 'GLwVPGYnU8F0p0jTNKUmf2rgIu4KrOah0vi6+LZd0DMPKlsVF00fpizhhw76V1+yIu8pvVGmufU=',
+	                      'RequestId': 'B26E9C978D7A2260',
+	                      'RetryAttempts': 0},
+	 'VersionIdMarker': '',
+	 'Versions': [{'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': True,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 9, 5, 2, 4, 18, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'GQqYjlcbQNcH1Uus7_nfqzWaMJzl74ui'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 9, 5, 2, 4, 18, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'gNf33wRMXOKhSdY4r2J0mWfXE2_UkLgk'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 31, 14, 56, 7, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'sXiCO.diogHRVt3jQta.y8r7qFCuLRUb'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 31, 14, 55, 48, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'u3Qd0jnqxV1w34e4rvMRBy2j67qMk6Gb'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 27, 17, 48, 36, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'gYTO.Gqoqri2YYfTXymGOr6AJA2IxEXs'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 27, 17, 48, 35, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'dFFz8R0a_5xmEIl0Vk3o9s.GdTV9._l8'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 26, 2, 51, 40, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'sxpEDY_GMP7lG72wsRX.jjvzm47NY_.B'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 26, 2, 51, 40, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'K9IBpNGvdeIhcAkS8f97caoHYvF3o6.8'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 26, 1, 51, 19, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'YRTNFsBM4NmasH5fR066qqKgKC1QJSEQ'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 26, 1, 51, 18, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': '_ox_td8PczAEXEaPl9_RYHidcXpAJY71'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 26, 1, 50, 26, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'lqW6FxEw55JvSLJfhZN17Q67.1d9_.O5'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 26, 1, 50, 26, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'V9f1XR2WjnrHk0cRtoDbxaSPDBosfnKv'},
+	              {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	               'IsLatest': False,
+	               'Key': 'sample.txt',
+	               'LastModified': datetime.datetime(2018, 8, 24, 3, 34, 46, tzinfo=tzutc()),
+	               'Size': 16,
+	               'StorageClass': 'STANDARD',
+	               'VersionId': 'RycgnmDZSUbomEiArJeTAcZBD6BKfooV'}]}
+
+# just the version portion of the response
+: version_list = version_all_data.get('Versions')
+: pprint(version_list)
+
+	[{'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': True,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 9, 5, 2, 4, 18, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'GQqYjlcbQNcH1Uus7_nfqzWaMJzl74ui'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 9, 5, 2, 4, 18, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'gNf33wRMXOKhSdY4r2J0mWfXE2_UkLgk'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 31, 14, 56, 7, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'sXiCO.diogHRVt3jQta.y8r7qFCuLRUb'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 31, 14, 55, 48, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'u3Qd0jnqxV1w34e4rvMRBy2j67qMk6Gb'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 27, 17, 48, 36, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'gYTO.Gqoqri2YYfTXymGOr6AJA2IxEXs'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 27, 17, 48, 35, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'dFFz8R0a_5xmEIl0Vk3o9s.GdTV9._l8'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 26, 2, 51, 40, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'sxpEDY_GMP7lG72wsRX.jjvzm47NY_.B'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 26, 2, 51, 40, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'K9IBpNGvdeIhcAkS8f97caoHYvF3o6.8'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 26, 1, 51, 19, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'YRTNFsBM4NmasH5fR066qqKgKC1QJSEQ'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 26, 1, 51, 18, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': '_ox_td8PczAEXEaPl9_RYHidcXpAJY71'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 26, 1, 50, 26, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'lqW6FxEw55JvSLJfhZN17Q67.1d9_.O5'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 26, 1, 50, 26, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'V9f1XR2WjnrHk0cRtoDbxaSPDBosfnKv'},
+	 {'ETag': '"6930ad3a6d2f96ce2991bbd51b2aaf6e"',
+	  'IsLatest': False,
+	  'Key': 'sample.txt',
+	  'LastModified': datetime.datetime(2018, 8, 24, 3, 34, 46, tzinfo=tzutc()),
+	  'Size': 16,
+	  'StorageClass': 'STANDARD',
+	  'VersionId': 'RycgnmDZSUbomEiArJeTAcZBD6BKfooV'}]
+
+# list only the version IDs
+: for version in version_list:
+:     versionId = version.get('VersionId')
+:     print(versionId)
+
+	GQqYjlcbQNcH1Uus7_nfqzWaMJzl74ui
+	gNf33wRMXOKhSdY4r2J0mWfXE2_UkLgk
+	sXiCO.diogHRVt3jQta.y8r7qFCuLRUb
+	u3Qd0jnqxV1w34e4rvMRBy2j67qMk6Gb
+	gYTO.Gqoqri2YYfTXymGOr6AJA2IxEXs
+	dFFz8R0a_5xmEIl0Vk3o9s.GdTV9._l8
+	sxpEDY_GMP7lG72wsRX.jjvzm47NY_.B
+	K9IBpNGvdeIhcAkS8f97caoHYvF3o6.8
+	YRTNFsBM4NmasH5fR066qqKgKC1QJSEQ
+	_ox_td8PczAEXEaPl9_RYHidcXpAJY71
+	lqW6FxEw55JvSLJfhZN17Q67.1d9_.O5
+	V9f1XR2WjnrHk0cRtoDbxaSPDBosfnKv
+	RycgnmDZSUbomEiArJeTAcZBD6BKfooV
+
+# this works without the version id
+: object_acl = s3sc.get_object_acl(
+:     Bucket=bucket,
+:     Key=fn)
+: pprint(object_acl)
+
+	{'Grants': [{'Grantee': {'DisplayName': 'imAowner',
+	                         'ID': '774ab3d545ed16464b9aee49278807d8f684d6badf068cb35c440e89685981',
+	                         'Type': 'CanonicalUser'},
+	             'Permission': 'FULL_CONTROL'}],
+	 'Owner': {'DisplayName': 'imAowner',
+	           'ID': '774ab3d545ed16464b9aee49278807d8f684d6badf068cb35c440e89685981'},
+	 'ResponseMetadata': {'HTTPHeaders': {'content-type': 'application/xml',
+	                                      'date': 'Wed, 05 Sep 2018 02:04:21 GMT',
+	                                      'server': 'AmazonS3',
+	                                      'transfer-encoding': 'chunked',
+	                                      'x-amz-id-2': '6eTTK34TtTgWkiuoDWHfC/SbCm8gtlcfoIlOmUUhMUvjvmwl+v8StaHMLuEJ/SZKnZcxbXb7GK8=',
+	                                      'x-amz-request-id': 'BE52E7CA564AD53D',
+	                                      'x-amz-version-id': 'GQqYjlcbQNcH1Uus7_nfqzWaMJzl74ui'},
+	                      'HTTPStatusCode': 200,
+	                      'HostId': '6eTTK34TtTgWkiuoDWHfC/SbCm8gtlcfoIlOmUUhMUvjvmwl+v8StaHMLuEJ/SZKnZcxbXb7GK8=',
+	                      'RequestId': 'BE52E7CA564AD53D',
+	                      'RetryAttempts': 0}}
+
+# to get this to work, bucket and object policies must be in replace
+# specifically look for s3:GetObjectVersionAcl
+: object_acl_byVersion = s3sc.get_object_acl(
+:     Bucket=bucket,
+:     Key=fn,
+:     VersionId=ver_id)
+: pprint(object_acl_byVersion)
+
+{'Grants': [{'Grantee': {'DisplayName': 'imAowner',
+											 'ID': '774ab3d545ed16464b9aee49278807d8f684d6badf068cb35c440e89685981',
+											 'Type': 'CanonicalUser'},
+					 'Permission': 'FULL_CONTROL'}],
+'Owner': {'DisplayName': 'imAowner',
+				 'ID': '774ab3d545ed16464b9aee49278807d8f684d6badf068cb35c440e89685981'},
+'ResponseMetadata': {'HTTPHeaders': {'content-type': 'application/xml',
+																		'date': 'Wed, 05 Sep 2018 02:04:21 GMT',
+																		'server': 'AmazonS3',
+																		'transfer-encoding': 'chunked',
+																		'x-amz-id-2': 'qxbRKt2BAcTlaKE92zyt45tghtvOQ0BLW1kwv00j4ASGHQmCJtuYPqb03x5cN+HL67Sd0L8W8JU=',
+																		'x-amz-request-id': 'E940D0016741A2F9',
+																		'x-amz-version-id': 'GQqYjlcbQNcH1Uus7_nfqzWaMJzl74ui'},
+										'HTTPStatusCode': 200,
+										'HostId': 'qxbRKt2BAcTlaKE92zyt45tghtvOQ0BLW1kwv00j4ASGHQmCJtuYPqb03x5cN+HL67Sd0L8W8JU=',
+										'RequestId': 'E940D0016741A2F9',
+										'RetryAttempts': 0}}
+
+
+# generating pre-signed URLs and getting the file
+: presigned_url = s3sc.generate_presigned_url(
+:     ClientMethod='get_object',
+:     Params={
+:         'Bucket': bucket,
+:         'Key': fn  })
+: pprint(presigned_url)
+
+	'https://my-bucket.s3.amazonaws.com/sample.txt?AWSAccessKeyId=AKIAIKGRXUSMECBVOLRA&Signature=HUxcAbuW2O8mYXOcsgl1ry0%3D&Expires=1536116662'
+
+# doesn't save the file; need to add that functionality
+: get_presigned_file = requests.get(presigned_url)
+: pprint(get_presigned_file)
+
+	<Response [200]>
+
+# print(get_presigned_file.text) ## works - prints contents of file
+
+# create a paginator with a max number of items returned
+paginator = s3sr.meta.client.get_paginator('list_objects_v2')
+
+# print the page object
+: page_iterator = paginator.paginate(Bucket=bucket_name.name ,
+:                                    PaginationConfig={'MaxItems': 50})
+: for page in page_iterator:
+:     pprint(page)
+
+###object info not shown, but does print out info for 50 objects
+
+# get the object information
+: for page in page_iterator:
+:     for obj in page.get('Contents'):
+:         print("Key = {} ; Etag = {}".format(obj['Key'], obj['ETag']))
+        # print(obj['Key'], obj['ETag'], obj['LastModified'], obj['Size'], obj['StorageClass'])
+
+	Key = fileFullResume.pdf ; Etag = "acfec4e6a625db044e45692cd89d8c4d"
+	Key = fileOnePageResume.pdf ; Etag = "2d8b1004e56933494925d626cf3b4ccc"
+	Key = images/ ; Etag = "d41d8cd98f00b204e9800998ecf8427e"
+	Key = images/1.jpg ; Etag = "9c200bd6328ebfc4d0bf67fcd0986fee"
+	Key = images/bg-tile.png ; Etag = "2215d5774532605fbc09de34756c1d04"
+	Key = images/bullet.png ; Etag = "3aa4748da661a821068506665095ec3b"
+	Key = images/myheadshot.jpg ; Etag = "9ff3f108e3042118ca8385d293d0f7c8"
+	Key = index.html ; Etag = "0bb988f8fed2d53e68d6f0f8b4f4dc7e"
+	Key = responsive.css ; Etag = "720b020bcf33309dc7d2f1b8fe90960b"
+	Key = sample.txt ; Etag = "6930ad3a6d2f96ce2991bbd51b2aaf6e"
+	Key = styles.css ; Etag = "12aacb3fb812ce9845cac09fcc033e73"
+	Key = synchtoS3.bat ; Etag = "0db24cf1d16b1abc5f0b9c5165fe1c8f"
+
+: for page in page_iterator:
+:     print("Number of keys on this page: {}".format(page.get('KeyCount')))
+:     print("Max number of keys possible: {}".format(page.get('MaxKeys')))
+
+		Number of keys on this page: 12
+		Max number of keys possible: 1000
+
+# find total number of objects in bucket
+# this will say 1000/1000 if more than 1000 objects, then IsTruncated is True
+: resp = s3sc.list_objects_v2(Bucket=bucket)
+: print('list_objects_v2 returned {}/{} files.'.format(resp['KeyCount'], resp['MaxKeys']))
+
+	list_objects_v2 returned 12/1000 files.
+
+: print(resp['IsTruncated'])
+
+	False
+
+
+# this will give the number of objects total
+: size = sum(1 for _ in bucket_name.objects.all())
+: print(size)
+
+	12
